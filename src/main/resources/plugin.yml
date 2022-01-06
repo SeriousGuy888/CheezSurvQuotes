@@ -1,0 +1,6 @@
+name: CheezSurvQuotes
+version: '${project.version}'
+main: io.github.seriousguy888.cheezsurvquotes.CheezSurvQuotes
+api-version: 1.18
+authors: [ SeriousGuy888 ]
+description: a simple plugin which periodically prints out text to players' actionbars provided with a link to a text file
