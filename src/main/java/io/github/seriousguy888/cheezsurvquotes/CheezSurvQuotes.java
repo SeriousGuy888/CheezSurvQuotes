@@ -23,11 +23,8 @@ public final class CheezSurvQuotes extends JavaPlugin {
   public void onEnable() {
     plugin = this;
 
-    config.addDefault("interval", 60);
-    config.addDefault("quotes.source_url", "[URL to some text file with a list of quotes]");
-    config.addDefault("quotes.delimiter", "\\n");
-    config.options().copyDefaults(true);
-    saveConfig();
+    config.options().copyDefaults();
+    saveDefaultConfig();
 
     getQuotes();
   }

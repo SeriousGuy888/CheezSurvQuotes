@@ -1,0 +1,4 @@
+interval: 60 # how many seconds between quotes
+quotes:
+  source_url: https://example.com/quotes.txt # direct link to a text file
+  delimiter: \n # what to split each quote in the text file by
