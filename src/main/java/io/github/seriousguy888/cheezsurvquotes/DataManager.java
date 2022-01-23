@@ -1,0 +1,85 @@
+package io.github.seriousguy888.cheezsurvquotes;
+
+import org.bukkit.Bukkit;
+import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
+
+import java.io.File;
+import java.io.IOException;
+
+public class DataManager implements Listener {
+  CheezSurvQuotes plugin;
+  public File dataFile;
+  public FileConfiguration dataConfig;
+
+  @SuppressWarnings("ResultOfMethodCallIgnored")
+  DataManager(CheezSurvQuotes plugin) {
+    this.plugin = plugin;
+
+    dataFile = new File(plugin.getDataFolder() + File.separator + "data.yml");
+    if(!dataFile.exists()) {
+      try {
+        dataFile.getParentFile().mkdirs();
+        dataFile.createNewFile();
+      } catch (IOException e) {
+        e.printStackTrace();
+      }
+    }
+    dataConfig = YamlConfiguration.loadConfiguration(dataFile);
+  }
+
+  /**
+   * Load in the preferences and data of all currently online players from data.yml.
+   */
+  public void loadPlayerData() {
+    Bukkit.getOnlinePlayers().forEach(this::loadPlayerData);
+  }
+
+  /**
+   * Load the preferences and data of a player from data.yml.
+   * @param player The player to load the data for.
+   */
+  public void loadPlayerData(Player player) {
+    String uuid = player.getUniqueId().toString();
+    boolean enabled = dataConfig.getBoolean(uuid + ".enabled", true);
+    plugin.quotesEnabled.put(player, enabled);
+  }
+
+
+  /**
+   * Save the preferences and data of all currently online players to data.yml.
+   */
+  public void savePlayerData() {
+    Bukkit.getOnlinePlayers().forEach(this::savePlayerData);
+  }
+
+  /**
+   * Save the preferences and data of a player and write it to data.yml.
+   * @param player The player to save the data for.
+   */
+  public void savePlayerData(Player player) {
+    String uuid = player.getUniqueId().toString();
+    Boolean enabled = plugin.quotesEnabled.get(player);
+
+    dataConfig.set(uuid + ".enabled", enabled);
+    try {
+      dataConfig.save(dataFile);
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+  }
+
+  @EventHandler
+  private void onJoin(PlayerJoinEvent event) {
+    loadPlayerData(event.getPlayer());
+  }
+  @EventHandler
+  private void onQuit(PlayerQuitEvent event) {
+    savePlayerData(event.getPlayer());
+  }
+}

@@ -1,32 +1,47 @@
 package io.github.seriousguy888.cheezsurvquotes;
 
+import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.plugin.Plugin;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.util.Arrays;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.Duration;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 
 public final class CheezSurvQuotes extends JavaPlugin {
-  public static CheezSurvQuotes plugin;
-
   FileConfiguration config = getConfig();
   List<String> quotesList;
+
+  public HashMap<Player, Boolean> quotesEnabled;
+  public DataManager dataManager;
 
 
   @Override
   public void onEnable() {
-    plugin = this;
-
     config.options().copyDefaults();
     saveDefaultConfig();
 
+    quotesEnabled = new HashMap<>();
+    dataManager = new DataManager(this);
+    dataManager.loadPlayerData();
+
     getQuotes();
+
+    Bukkit.getPluginManager().registerEvents(dataManager, this);
+    Objects.requireNonNull(getCommand("togglequotes"))
+        .setExecutor(new ToggleQuotesCommand(this));
+  }
+
+  @Override
+  public void onDisable() {
+    dataManager.savePlayerData();
   }
 
   private void getQuotes() {
@@ -67,7 +82,7 @@ public final class CheezSurvQuotes extends JavaPlugin {
 
           String body = response.body();
           quotesList = Arrays.asList((body.split(delimiter)));
-          new ShowQuoteTask().runTaskTimer(this, 0L, interval * 20L);
+          new ShowQuoteTask(this).runTaskTimer(this, 0L, interval * 20L);
         });
   }
 }
