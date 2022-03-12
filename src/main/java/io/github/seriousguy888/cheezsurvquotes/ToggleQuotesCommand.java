@@ -20,12 +20,11 @@ public class ToggleQuotesCommand implements CommandExecutor {
                            @Nonnull Command command,
                            @Nonnull String commandLabel,
                            @Nonnull String[] args) {
-    if(!(sender instanceof Player)) {
+    if(!(sender instanceof Player player)) {
       sender.sendMessage("The console cannot use this command!");
       return true;
     }
 
-    Player player = (Player) sender;
     Boolean enabled = plugin.quotesEnabled.get(player);
 
     player.sendMessage(ChatColor.YELLOW + (enabled ? "Disabled" : "Enabled") + " showing quotes.");
